@@ -10,26 +10,31 @@ const Header: FC = () => (
   </header>
 );
 
-const Image: FC = () => (
+type imageProps = {
+  src: string;
+};
+
+const Image: FC<imageProps> = ({ src }) => (
   <div className="card">
     <div className="card-image">
       <figure className="image">
-        <img
-          src="https://images.dog.ceo/breeds/shiba/shiba-8.jpg"
-          alt="cute dog"
-        />
+        <img src={src} alt="cute dog" />
       </figure>
     </div>
   </div>
 );
 
-const Gallery: FC = () => (
-  <div className="columns is-vcentered is-multiline">
-    <div className="column is-3">
-      <Image />
+const Gallery: FC = () => {
+  const url = "https://images.dog.ceo/breeds/shiba/shiba-8.jpg";
+
+  return (
+    <div className="columns is-vcentered is-multiline">
+      <div className="column is-3">
+        <Image src={url} />
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Main: FC = () => (
   <main>
