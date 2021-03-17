@@ -24,19 +24,27 @@ const Image: FC<imageProps> = ({ src }) => (
   </div>
 );
 
+const Loading = () => <p>Loading...</p>;
+
 type galleryProps = {
-  urls: string[];
+  urls: string[] | null;
 };
 
-const Gallery: FC<galleryProps> = ({ urls }) => (
-  <div className="columns is-vcentered is-multiline">
-    {urls.map((url) => (
-      <div key={url} className="column is-3">
-        <Image src={url} />
-      </div>
-    ))}
-  </div>
-);
+const Gallery: FC<galleryProps> = ({ urls }) => {
+  if (urls == null) {
+    return <Loading />;
+  }
+
+  return (
+    <div className="columns is-vcentered is-multiline">
+      {urls.map((url) => (
+        <div key={url} className="column is-3">
+          <Image src={url} />
+        </div>
+      ))}
+    </div>
+  );
+};
 const Main: FC = () => {
   const urls = [
     "https://images.dog.ceo/breeds/shiba/shiba-11.jpg",
