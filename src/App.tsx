@@ -1,4 +1,12 @@
-import React, { FC } from "react";
+import {
+  FC,
+  useEffect,
+  useState,
+  FormEventHandler,
+  ChangeEventHandler,
+} from "react";
+import { fetchImages } from "./api";
+import breedsList from "./const";
 
 const Header: FC = () => (
   <header className="hero is-dark is-bold">
@@ -45,24 +53,79 @@ const Gallery: FC<galleryProps> = ({ urls }) => {
     </div>
   );
 };
+
+type FormType = {
+  onFormSubmit: (breed: string) => void;
+};
+
+const Form: FC<FormType> = ({ onFormSubmit }) => {
+  const [breed, setBreed] = useState<string>("shiba");
+
+  const handleSubmit2: FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    onFormSubmit(breed);
+  };
+
+  const handleChange2: ChangeEventHandler<HTMLSelectElement> = (event) => {
+    setBreed(event.target.value);
+  };
+
+  const sortedBreedsList = breedsList
+    .concat()
+    .sort((a, b) => (a[1] < b[1] ? -1 : 1));
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit2}>
+        <div className="field has-addons">
+          <div className="control is-expanded">
+            <div className="select is-fullwidth">
+              <select
+                name="breed"
+                defaultValue="shiba"
+                onChange={handleChange2}
+              >
+                {sortedBreedsList.map((elm) => (
+                  <option value={elm[0]}>{elm[1]}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="control">
+            <button type="submit" className="button is-dark">
+              Reload
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
 const Main: FC = () => {
-  const urls = [
-    "https://images.dog.ceo/breeds/shiba/shiba-11.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-12.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-14.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-17.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-2.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-3i.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-4.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-5.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-6.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-7.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-8.jpg",
-    "https://images.dog.ceo/breeds/shiba/shiba-9.jpg",
-  ];
+  const [urls, setUrls] = useState<string[] | null>(null);
+
+  useEffect(() => {
+    const load = async (): Promise<void> => {
+      const res = await fetchImages("shiba");
+      setUrls(res);
+    };
+    void load();
+  }, []);
+
+  const reloadImages = (breed: string) => {
+    void fetchImages(breed).then((res) => {
+      setUrls(res);
+    });
+  };
 
   return (
     <main>
+      <section className="section">
+        <div className="container">
+          <Form onFormSubmit={reloadImages} />
+        </div>
+      </section>
       <section className="section">
         <div className="container">
           <Gallery urls={urls} />
