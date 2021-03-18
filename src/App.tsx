@@ -36,11 +36,15 @@ const Loading = () => <p>Loading...</p>;
 
 type galleryProps = {
   urls: string[] | null;
+  isLoading: boolean;
 };
 
-const Gallery: FC<galleryProps> = ({ urls }) => {
-  if (urls == null) {
+const Gallery: FC<galleryProps> = ({ urls, isLoading }) => {
+  if (isLoading) {
     return <Loading />;
+  }
+  if (urls == null) {
+    return <div>error</div>;
   }
 
   return (
@@ -86,7 +90,9 @@ const Form: FC<FormType> = ({ onFormSubmit }) => {
                 onChange={handleChange2}
               >
                 {sortedBreedsList.map((elm) => (
-                  <option value={elm[0]}>{elm[1]}</option>
+                  <option key={elm[0]} value={elm[0]}>
+                    {elm[1]}
+                  </option>
                 ))}
               </select>
             </div>
@@ -104,11 +110,19 @@ const Form: FC<FormType> = ({ onFormSubmit }) => {
 
 const Main: FC = () => {
   const [urls, setUrls] = useState<string[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     const load = async (): Promise<void> => {
-      const res = await fetchImages("shiba");
-      setUrls(res);
+      try {
+        const res = await fetchImages("shiba");
+        setUrls(res);
+      } catch (err) {
+        setUrls(null);
+      } finally {
+        setIsLoading(false);
+      }
     };
     void load();
   }, []);
@@ -128,7 +142,7 @@ const Main: FC = () => {
       </section>
       <section className="section">
         <div className="container">
-          <Gallery urls={urls} />
+          <Gallery urls={urls} isLoading={isLoading} />
         </div>
       </section>
     </main>
